@@ -1,47 +1,16 @@
-import sqlite3
-
 from sqlalchemy import ( # type: ignore
-    create_engine,
-    Column, Integer, String, Boolean, DateTime, ForeignKey, Date, Enum, event
+    Column, Integer, String, Boolean, DateTime, ForeignKey, Date, Enum
 )
 
-from sqlalchemy.engine import Engine # type: ignore
 
 from sqlalchemy.orm import ( # type: ignore
     relationship,
-    sessionmaker
 )
 
 from database import Base
 
 from sqlalchemy.sql import func # type: ignore
 
-# =========================================================
-# CONFIGURAÇÃO DO BANCO: CRIANDO O BANCO DE DADOS NO ENDEREÇO "sqlite:///banco.db"
-# ========================================================
-engine = create_engine(
-    "sqlite:///banco.db",
-    connect_args={"check_same_thread": False}
-)
-
-# Ativa Foreign Keys no SQLite
-@event.listens_for(Engine, "connect")
-def set_sqlite_pragma(dbapi_connection, connection_record):
-
-    if isinstance(dbapi_connection, sqlite3.Connection):
-
-        cursor = dbapi_connection.cursor()
-
-        cursor.execute("PRAGMA foreign_keys=ON;")
-
-        cursor.close()
-
-
-SessionLocal = sessionmaker(
-    autocommit=False,
-    autoflush=False,
-    bind=engine
-)
 
 
 # =========================================================
@@ -465,4 +434,3 @@ class CredencialSUAP(Base):
         "Usuario",
         back_populates="credencial_suap"
     )
-# executa a criação dos metadados do seu banco (cria efetivamente o banco de dados)

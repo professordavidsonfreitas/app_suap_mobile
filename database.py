@@ -1,49 +1,64 @@
-import sqlite3
+# =========================================================
+# CONFIGURAÇÃO DO BANCO: CRIANDO O BANCO DE DADOS NO ENDEREÇO "sqlite:///banco.db"
+# ========================================================
 
-from sqlalchemy import (
-    create_engine,
-    event
+import os
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+# =========================================================
+# DATABASE URL
+# =========================================================
+
+DATABASE_URL = os.getenv(
+
+    "DATABASE_URL",
+
+    "sqlite:///banco.db"
 )
 
-from sqlalchemy.engine import Engine
+# =========================================================
+# SQLITE
+# =========================================================
 
-from sqlalchemy.orm import (
-    declarative_base,
-    sessionmaker
-)
+if DATABASE_URL.startswith("sqlite"):
 
-DATABASE_URL = "sqlite:///banco.db"
+    engine = create_engine(
 
-engine = create_engine(
-    DATABASE_URL,
-    connect_args={"check_same_thread": False}
-)
+        DATABASE_URL,
 
-# Ativa Foreign Keys no SQLite
-@event.listens_for(Engine, "connect")
-def set_sqlite_pragma(
-    dbapi_connection,
-    connection_record
-):
+        connect_args={
+            "check_same_thread": False
+        }
+    )
 
-    if isinstance(
-        dbapi_connection,
-        sqlite3.Connection
-    ):
+# =========================================================
+# POSTGRES / OUTROS
+# =========================================================
 
-        cursor = dbapi_connection.cursor()
+else:
 
-        cursor.execute(
-            "PRAGMA foreign_keys=ON;"
-        )
+    engine = create_engine(
+        DATABASE_URL
+    )
 
-        cursor.close()
-
+# =========================================================
+# SESSION
+# =========================================================
 
 SessionLocal = sessionmaker(
+
     autocommit=False,
+
     autoflush=False,
+
     bind=engine
 )
+
+# =========================================================
+# BASE ORM
+# =========================================================
 
 Base = declarative_base()
