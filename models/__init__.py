@@ -1,0 +1,1 @@
+from .app_version import AppVersion

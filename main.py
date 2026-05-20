@@ -22,11 +22,12 @@ app.add_middleware(
 from routers.auth_routes import auth_router
 from routers.admin_routes import admin_router
 from routers.student_routes import student_router
+from routers.app_version_routes import router as app_version_router
 
 app.include_router(auth_router)
 app.include_router(admin_router)
 app.include_router(student_router)
-
+app.include_router(app_version_router)
 
 if __name__ == "__main__":
     import uvicorn

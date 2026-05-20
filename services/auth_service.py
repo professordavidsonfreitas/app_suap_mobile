@@ -8,6 +8,8 @@ from models.usuario import (
     UsuarioTAE
 )
 
+import os
+
 from schemas.auth import (RegistroExternoRequest)
 from services.suap_service import autenticar_suap
 
@@ -201,18 +203,10 @@ async def autenticar_usuario(
     }
 
 
-async def criar_usuario_suap(
-    db,
-    dados
-):
+async def criar_usuario_suap(db, dados):
 
-    tipo_perfil = dados.get(
-        "tipo_perfil"
-    )
-
-    subtipo_perfil = dados.get(
-        "subtipo_perfil"
-    )
+    tipo_perfil = dados.get("tipo_perfil")
+    subtipo_perfil = dados.get("subtipo_perfil")
 
     # =====================================================
     # DEFINE PERFIL BASE
@@ -220,20 +214,10 @@ async def criar_usuario_suap(
 
     perfil_usuario = "estudante"
 
-    if (
-        tipo_perfil == "servidor"
-        and
-        subtipo_perfil == "docente"
-    ):
-
+    if (tipo_perfil == "servidor" and subtipo_perfil == "docente"):
         perfil_usuario = "professor"
 
-    elif (
-        tipo_perfil == "servidor"
-        and
-        subtipo_perfil == "tae"
-    ):
-
+    elif (tipo_perfil == "servidor" and subtipo_perfil == "tae"):
         perfil_usuario = "tae"
 
     # =====================================================
@@ -241,67 +225,40 @@ async def criar_usuario_suap(
     # =====================================================
 
     usuario = Usuario(
-
         login=dados.get("matricula"),
-
         nome=dados.get("nome"),
-
         cpf=dados.get("cpf"),
-
         nascimento=None,
-
-        email_pessoal=dados.get(
-            "email_pessoal"
-        ),
-
-        telefone=dados.get(
-            "telefone"
-        ),
-
+        email_pessoal=dados.get("email_pessoal"),
+        telefone=dados.get("telefone"),
         senha_hash=None,
-
         perfil=perfil_usuario,
-
         tipo_login="suap"
     )
 
-    db.add(usuario)
+    BOOTSTRAP_ADMIN = os.getenv("BOOTSTRAP_ADMIN")
 
+    if usuario.login == BOOTSTRAP_ADMIN:
+        usuario.admin = True
+        
+    db.add(usuario)
     db.flush()
+
+    
 
     # =====================================================
     # ESTUDANTE
     # =====================================================
 
     if tipo_perfil == "estudante":
-
         estudante = UsuarioEstudante(
-
             usuario_id=usuario.id,
-
-            matricula=dados.get(
-                "matricula"
-            ),
-
-            email_institucional=dados.get(
-                "email_institucional"
-            ),
-
-            curso=dados.get(
-                "curso"
-            ),
-
-            matriz=dados.get(
-                "matriz"
-            ),
-
-            ira=dados.get(
-                "ira"
-            ),
-
-            ano_ingresso=dados.get(
-                "ano_ingresso"
-            )
+            matricula=dados.get("matricula"),
+            email_institucional=dados.get("email_institucional"),
+            curso=dados.get("curso"),
+            matriz=dados.get("matriz"),
+            ira=dados.get("ira"),
+            ano_ingresso=dados.get("ano_ingresso")
         )
 
         db.add(estudante)
@@ -310,78 +267,31 @@ async def criar_usuario_suap(
     # DOCENTE
     # =====================================================
 
-    elif (
-        tipo_perfil == "servidor"
-        and
-        subtipo_perfil == "docente"
-    ):
-
+    elif (tipo_perfil == "servidor" and subtipo_perfil == "docente"):
         professor = UsuarioProfessor(
-
             usuario_id=usuario.id,
-
-            matricula=dados.get(
-                "matricula"
-            ),
-
-            email_institucional=dados.get(
-                "email_institucional"
-            ),
-
-            cargo=dados.get(
-                "cargo"
-            ),
-
-            setor=dados.get(
-                "setor"
-            ),
-
-            campus=dados.get(
-                "campus"
-            ),
-
-            area_atuacao=dados.get(
-                "area_atuacao"
-            )
+            matricula=dados.get("matricula"),
+            email_institucional=dados.get("email_institucional"),
+            cargo=dados.get("cargo"),
+            setor=dados.get("setor"),
+            campus=dados.get("campus"),
+            area_atuacao=dados.get("area_atuacao")
         )
-
         db.add(professor)
 
     # =====================================================
     # TAE
     # =====================================================
 
-    elif (
-        tipo_perfil == "servidor"
-        and
-        subtipo_perfil == "tae"
-    ):
-
+    elif (tipo_perfil == "servidor" and subtipo_perfil == "tae"):
         tae = UsuarioTAE(
-
             usuario_id=usuario.id,
-
-            matricula=dados.get(
-                "matricula"
-            ),
-
-            email_institucional=dados.get(
-                "email_institucional"
-            ),
-
-            cargo=dados.get(
-                "cargo"
-            ),
-
-            setor=dados.get(
-                "setor"
-            ),
-
-            campus=dados.get(
-                "campus"
-            )
+            matricula=dados.get("matricula"),
+            email_institucional=dados.get("email_institucional"),
+            cargo=dados.get("cargo"),
+            setor=dados.get("setor"),
+            campus=dados.get("campus")
         )
-
         db.add(tae)
 
     # =====================================================

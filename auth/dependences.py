@@ -63,3 +63,15 @@ async def get_current_user(
         )
 
     return usuario
+
+async def get_current_admin(
+    usuario: Usuario = Depends(get_current_user)
+):
+    if not usuario.is_admin:
+
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="acesso negado"
+        )
+
+    return usuario
