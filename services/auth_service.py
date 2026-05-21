@@ -15,38 +15,42 @@ from services.suap_service import autenticar_suap
 
 from utils.security import gerar_hash, verificar_senha
 
+def limpar_cpf(cpf: str) -> str:
+    """Remove formatação do CPF (pontos e hífens)"""
+    if not cpf:
+        return cpf
+    return cpf.replace(".", "").replace("-", "")
+
 async def registrar_usuario_externo(
     db: Session,
     dados: RegistroExternoRequest
 ):
     # =====================================================
+    # LIMPA CPF
+    # =====================================================
+    cpf_limpo = limpar_cpf(dados.cpf)
+    
+    # =====================================================
     # VERIFICA SE CPF JÁ EXISTE
     # =====================================================
-
     usuario_existente = db.query(Usuario).filter(
-        Usuario.cpf == dados.cpf
+        Usuario.cpf == cpf_limpo
     ).first()
-
     if usuario_existente:
-
         raise Exception(
             "CPF já cadastrado"
         )
-
     # =====================================================
     # CRIA USUÁRIO PRINCIPAL
     # =====================================================
-
     usuario = Usuario(
-        login=dados.cpf,
+        login=cpf_limpo,  # ← USE CPF LIMPO
         nome=dados.nome,
-        cpf=dados.cpf,
+        cpf=cpf_limpo,  # ← USE CPF LIMPO
         nascimento=dados.nascimento,
         email_pessoal=dados.email_pessoal,
         telefone=dados.telefone,
-        senha_hash=gerar_hash(
-            dados.senha
-        ),
+        senha_hash=gerar_hash(dados.senha),
         perfil="externo",
         tipo_login="cpf"
     )
@@ -204,30 +208,28 @@ async def autenticar_usuario(
 
 
 async def criar_usuario_suap(db, dados):
-
+    # =====================================================
+    # LIMPA CPF
+    # =====================================================
+    cpf_limpo = limpar_cpf(dados.get("cpf"))
+    
     tipo_perfil = dados.get("tipo_perfil")
     subtipo_perfil = dados.get("subtipo_perfil")
-
     # =====================================================
     # DEFINE PERFIL BASE
     # =====================================================
-
     perfil_usuario = "estudante"
-
     if (tipo_perfil == "servidor" and subtipo_perfil == "docente"):
         perfil_usuario = "professor"
-
     elif (tipo_perfil == "servidor" and subtipo_perfil == "tae"):
         perfil_usuario = "tae"
-
     # =====================================================
     # CRIA USUÁRIO BASE
     # =====================================================
-
     usuario = Usuario(
         login=dados.get("matricula"),
         nome=dados.get("nome"),
-        cpf=dados.get("cpf"),
+        cpf=cpf_limpo,  # ← USE CPF LIMPO
         nascimento=None,
         email_pessoal=dados.get("email_pessoal"),
         telefone=dados.get("telefone"),
