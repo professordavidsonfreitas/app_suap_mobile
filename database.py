@@ -13,22 +13,16 @@ from sqlalchemy.orm import sessionmaker #type: ignore
 # =========================================================
 
 DATABASE_URL = os.getenv(
-
     "DATABASE_URL",
-
-    "sqlite:///banco.db"
-)
+    "sqlite:///banco.db")
 
 # =========================================================
 # SQLITE
 # =========================================================
 
 if DATABASE_URL.startswith("sqlite"):
-
     engine = create_engine(
-
         DATABASE_URL,
-
         connect_args={
             "check_same_thread": False
         }
@@ -39,7 +33,6 @@ if DATABASE_URL.startswith("sqlite"):
 # =========================================================
 
 else:
-
     engine = create_engine(
         DATABASE_URL
     )
@@ -49,11 +42,8 @@ else:
 # =========================================================
 
 SessionLocal = sessionmaker(
-
     autocommit=False,
-
     autoflush=False,
-
     bind=engine
 )
 
