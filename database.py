@@ -62,4 +62,5 @@ from models.app_version import AppVersion
 # =========================================================
 # CRIAR TABELAS (se não existirem)
 # =========================================================
-Base.metadata.create_all(bind=engine)
+# Criar tabelas apenas quando necessário (não na inicialização)
+# Base.metadata.create_all(bind=engine)
