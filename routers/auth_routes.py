@@ -134,7 +134,8 @@ async def me(usuario: Usuario = Depends(get_current_user)):
         "cpf": usuario.cpf,
         "email_pessoal": usuario.email_pessoal,
         "telefone": usuario.telefone,
-        "tipo_login": usuario.tipo_login
+        "tipo_login": usuario.tipo_login,
+        "admin": usuario.admin
     }
 
     # =====================================================
