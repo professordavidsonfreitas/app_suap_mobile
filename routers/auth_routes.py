@@ -1,30 +1,23 @@
 from fastapi import (APIRouter, Depends, HTTPException, status) # type: ignore
 from sqlalchemy.orm import Session # type: ignore
-
+from database import get_db  # ← AQUI
 from auth.dependences import get_current_user
-
-from database import SessionLocal
-
 from schemas.auth import (
     LoginRequest,
     RegistroExternoRequest,
     SincronizarRequest
 )
-
 from services.auth_service import (
     autenticar_usuario,
     registrar_usuario_externo,
     sincronizar_usuario_suap
 )
-
 from schemas.auth import (
     UsuarioMeResponse
 )
-
 from services.suap_service import (
     autenticar_suap
 )
-
 from models.usuario import Usuario
 
 # =========================================================
